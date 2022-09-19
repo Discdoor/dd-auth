@@ -1,0 +1,19 @@
+{
+    "http": {
+        "port": 8082
+    },
+    "db": {
+        "url": "mongodb://localhost:27017"
+    },
+    "crypto": {
+        "algo": "bcrypt",
+        "params": {
+            "salt": [
+                246, 117, 237, 17,
+                141,   4, 134, 99,
+                147, 169, 122, 142
+            ],
+            "rounds": 13
+        }
+    }
+}
