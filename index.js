@@ -5,10 +5,9 @@ Authentication service source.
 const express = require('express');
 const app = express();
 const cfg = require('./data/config.json');
-const mongoose = require('mongoose');
-const { hashStrgSalted, getSaltStr } = require('./lib/util/crypt');
 const User = require('./lib/types/user');
 const { MongoClient } = require('mongodb');
+const UserManager = require('./lib/mgmt/usermgr');
 const dbClient = new MongoClient(cfg.db.url);
 
 app.use(express.json());
@@ -28,7 +27,6 @@ app.post(`/auth/register`, (req, res)=>{
  * App entry point.
  */
 async function main() {
-    console.log(new User());
     // Step 1: Connect to database
     console.log("Connecting to database...");
 
@@ -40,6 +38,9 @@ async function main() {
         console.error(e);
         process.exit(1);
     }
+
+    const umgr = await new UserManager(dbClient.db('discdoor'));
+    console.log(await umgr.createUser("Abc@defg.com", "Abcdefg", "abcdefg", new Date()));
 
     // Step 2: Start HTTP server
     app.listen(cfg.http.port, async () => {

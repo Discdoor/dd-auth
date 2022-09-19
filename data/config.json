@@ -15,5 +15,14 @@
             ],
             "rounds": 13
         }
+    },
+    "limits": {
+        "username": {
+            "minLen": 2,
+            "maxLen": 30
+        }
+    },
+    "defaults": {
+        "avatarUrl": "/assets/defaults/avatar1.png"
     }
 }
