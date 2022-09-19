@@ -7,7 +7,9 @@ const app = express();
 const cfg = require('./data/config.json');
 const mongoose = require('mongoose');
 const { hashStrgSalted, getSaltStr } = require('./lib/util/crypt');
-const mgClient = new mongoose.Mongoose();
+const User = require('./lib/types/user');
+const { MongoClient } = require('mongodb');
+const dbClient = new MongoClient(cfg.db.url);
 
 app.use(express.json());
 
@@ -17,7 +19,7 @@ app.use(express.json());
  * Registration endpoint - registers a user.
  */
 app.post(`/auth/register`, (req, res)=>{
-    console.log(req.body);
+    
 });
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++ //
@@ -26,11 +28,12 @@ app.post(`/auth/register`, (req, res)=>{
  * App entry point.
  */
 async function main() {
+    console.log(new User());
     // Step 1: Connect to database
     console.log("Connecting to database...");
 
     try {
-        await mgClient.connect(cfg.db.url);
+        await dbClient.connect();
         console.log("DB connection success!");
     } catch(e) {
         console.log("Error: Database connection failure, see exception below:");
