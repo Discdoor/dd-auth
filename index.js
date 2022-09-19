@@ -9,14 +9,18 @@ const mongoose = require('mongoose');
 const { hashStrgSalted, getSaltStr } = require('./lib/util/crypt');
 const mgClient = new mongoose.Mongoose();
 
-// App routes
+app.use(express.json());
+
+// ++++++++++++++++++ END POINTS ++++++++++++++++++ //
 
 /**
  * Registration endpoint - registers a user.
  */
-app.get(`/auth/register`, (req, res)=>{
-    
+app.post(`/auth/register`, (req, res)=>{
+    console.log(req.body);
 });
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++ //
 
 /**
  * App entry point.
