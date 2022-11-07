@@ -9,9 +9,13 @@ const User = require('./lib/types/user');
 const { MongoClient } = require('mongodb');
 const UserManager = require('./lib/mgmt/usermgr');
 const dbClient = new MongoClient(cfg.db.url);
+const cors = require('cors');
 
 // Set a reasonable limit for the JSON body parser
 app.use(express.json({limit: '10kb'}));
+
+// Disable CORS since the auth server will be going thru the gateway anyway.
+app.use(cors());
 
 // Vars
 /** @type {UserManager} */
@@ -33,16 +37,22 @@ app.post(`/auth/register`, async(req, res)=>{
         const result = await userMgr.createUser(req.body.email, req.body.username, req.body.password, new Date(req.body.dob));
 
         res.end(JSON.stringify({
-            username: result.username,
-            discrim: result.discrim,
-            email: result.email,
-            verifStatus: result.verifStatus,
-            avatarUrl: result.avatarUrl 
+            success: true,
+            code: 0,
+            message: "",
+            data: {
+                username: result.username,
+                discrim: result.discrim,
+                email: result.email,
+                verifStatus: result.verifStatus,
+                avatarUrl: result.avatarUrl 
+            }
         }));
     } catch(e) {
         console.error(e);
         res.status(400);
         res.end(JSON.stringify({
+            success: false,
             code: (e.code != null) ? e.code : -1,
             message: (e.message != null) ? e.message : e
         }));
