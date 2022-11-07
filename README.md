@@ -17,3 +17,7 @@ This service handles verification AND generation. It is recommended to run a clu
 3. Update `data/config.json` with the correct database URL.
 
 4. Run `node index.js` to start this service.
+
+## Important!
+
+Remember to CHANGE THE SALT! The default one provided here has only been provided for simplicity and testing, but please change it for production to avoid security issues.
