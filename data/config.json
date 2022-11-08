@@ -16,6 +16,9 @@
             "rounds": 13
         }
     },
+    "session": {
+        "maxAge": 604800
+    },
     "limits": {
         "username": {
             "minLen": 2,
