@@ -101,7 +101,34 @@ app.get("/user/:userId", async(req, res) => {
     } catch(e) {
         sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
     }
-})
+});
+
+/*
+Patch endpoint for user state change.
+*/
+app.patch("/user/:userId", async(req, res) => {
+    try {
+        // Get the user
+        // Validate the schema
+        validateSchema({
+            password: { type: "string", maxLength: 64, optional: true }
+            // TODO add fields for username and email
+        }, req.body);
+        
+        const user = await userMgr.getUserById(req.params.userId);
+
+        if(!user)
+            throw new Error("User not found.");
+
+        // Change the requested properties
+        if(req.body.password != null)
+            await user.changePassword(req.body.password);
+
+        sendResponseObject(res, 200, constructResponseObject(true, "", user.createSafeView()));
+    } catch(e) {
+        sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
+    }
+});
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++ //
 
