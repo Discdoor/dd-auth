@@ -33,9 +33,6 @@ const appContext = {
 // ++++++++++++++++++ END POINTS ++++++++++++++++++ //
 
 // --- Unprivileged routes ---
-
-app.post(`/`)
-
 /**
  * Registration endpoint - registers a user.
  */
@@ -94,6 +91,7 @@ app.post('/login', async(req, res) => {
 require('./lib/middleware/session-verif').init(appContext);
 
 // --- Privileged routes ---
+app.post("/session/validate", (req, res) => sendResponseObject(res, 200, constructResponseObject(true, "")));
 
 /*
 State endpoint - get the current user state.
