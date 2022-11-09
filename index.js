@@ -11,6 +11,7 @@ const dbClient = new MongoClient(cfg.db.url);
 const cors = require('cors');
 const libdd = require('libdd-node');
 const { RGX_EMAIL } = require('./lib/util/regex');
+const SessionManager = require('./lib/mgmt/sessionmgr');
 const { constructResponseObject, sendResponseObject } = libdd.api;
 const { validateSchema } = libdd.schema;
 
@@ -24,6 +25,9 @@ app.use(cors());
 /** @type {UserManager} */
 let userMgr;
 
+/** @type {SessionManager} */
+let sessionMgr;
+
 // ++++++++++++++++++ END POINTS ++++++++++++++++++ //
 
 /**
@@ -36,27 +40,23 @@ app.post(`/register`, async(req, res)=>{
             username: { type: "string", minLength: cfg.limits.username.minLen, maxLength: cfg.limits.username.maxLen },
             email: { type: "string", regex: RGX_EMAIL },
             password: { type: "string", minLength: 2, maxLength: 64 }, // Reasonable limit
-            dob: { type: "number", min: 0 }
+            dob: { type: "number" }
         }, req.body);
 
         const result = await userMgr.createUser(req.body.email, req.body.username, req.body.password, new Date(req.body.dob));
         
-        return sendResponseObject(res, 200, constructResponseObject(true, "", {
-            username: result.username,
-            discrim: result.discrim,
-            email: result.email,
-            verifStatus: result.verifStatus,
-            avatarUrl: result.avatarUrl 
-        }));
+        // Create a session
+        const session = await sessionMgr.createSession(result);
+        sendResponseObject(res, 200, constructResponseObject(true, "", session));
     } catch(e) {
         sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
     }
 });
 
 /**
- * Validation endpoint - validate the user login.
+ * Login endpoint - log the user in.
  */
-app.post('/validate', async(req, res) => {
+app.post('/login', async(req, res) => {
     try {
         // Check types
         validateSchema({
@@ -75,8 +75,10 @@ app.post('/validate', async(req, res) => {
 
         if(!result)
             throw new Error("Password does not match.");
-        else
-            sendResponseObject(res, 200, constructResponseObject(true, "", user.createSafeView()));
+        
+        // Create a session
+        const session = await sessionMgr.createSession(user);
+        sendResponseObject(res, 200, constructResponseObject(true, "", session));
     } catch(e) {
         sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
     }
@@ -151,6 +153,7 @@ async function main() {
         await dbClient.connect();
         const db = dbClient.db('discdoor');
         userMgr = new UserManager(db);
+        sessionMgr = new SessionManager(db);
         console.log("DB connection success!");
     } catch(e) {
         console.log("Error: Database connection failure, see exception below:");
