@@ -21,14 +21,20 @@ app.use(express.json({limit: '10kb'}));
 // Disable CORS since the auth server will be going thru the gateway anyway.
 app.use(cors());
 
-// Vars
-/** @type {UserManager} */
-let userMgr;
-
-/** @type {SessionManager} */
-let sessionMgr;
+// App context
+const appContext = {
+    app,
+    /** @type {UserManager} */
+    userMgr: null,
+    /** @type {SessionManager} */
+    sessionMgr: null
+};
 
 // ++++++++++++++++++ END POINTS ++++++++++++++++++ //
+
+// --- Unprivileged routes ---
+
+app.post(`/`)
 
 /**
  * Registration endpoint - registers a user.
@@ -43,10 +49,10 @@ app.post(`/register`, async(req, res)=>{
             dob: { type: "number" }
         }, req.body);
 
-        const result = await userMgr.createUser(req.body.email, req.body.username, req.body.password, new Date(req.body.dob));
+        const result = await appContext.userMgr.createUser(req.body.email, req.body.username, req.body.password, new Date(req.body.dob));
         
         // Create a session
-        const session = await sessionMgr.createSession(result);
+        const session = await appContext.sessionMgr.createSession(result);
         sendResponseObject(res, 200, constructResponseObject(true, "", session));
     } catch(e) {
         sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
@@ -65,7 +71,7 @@ app.post('/login', async(req, res) => {
         }, req.body);
 
         // Find user
-        const user = await userMgr.getUserByEmail(req.body.email);
+        const user = await appContext.userMgr.getUserByEmail(req.body.email);
 
         if(!user)
             throw new Error("User not found.");
@@ -77,24 +83,25 @@ app.post('/login', async(req, res) => {
             throw new Error("Password does not match.");
         
         // Create a session
-        const session = await sessionMgr.createSession(user);
+        const session = await appContext.sessionMgr.createSession(user);
         sendResponseObject(res, 200, constructResponseObject(true, "", session));
     } catch(e) {
         sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
     }
 });
 
+// Add session verification middleware
+require('./lib/middleware/session-verif').init(appContext);
+
+// --- Privileged routes ---
+
 /*
 State endpoint - get the current user state.
 */
-app.get("/user/:userId", async(req, res) => {
+app.get("/user/@me", async(req, res) => {
     try {
         // Get the user
-        validateSchema({
-            userId: { type: "string" }
-        }, req.params);
-        
-        const user = await userMgr.getUserById(req.params.userId);
+        const user = await appContext.userMgr.getUserById(req.session.id);
 
         if(!user)
             throw new Error("User not found.");
@@ -108,7 +115,7 @@ app.get("/user/:userId", async(req, res) => {
 /*
 Patch endpoint for user state change.
 */
-app.patch("/user/:userId", async(req, res) => {
+app.patch("/user/@me", async(req, res) => {
     try {
         // Get the user
         // Validate the schema
@@ -117,7 +124,7 @@ app.patch("/user/:userId", async(req, res) => {
             // TODO add fields for username and email
         }, req.body);
         
-        const user = await userMgr.getUserById(req.params.userId);
+        const user = await appContext.userMgr.getUserById(req.session.id);
 
         if(!user)
             throw new Error("User not found.");
@@ -152,8 +159,8 @@ async function main() {
     try {
         await dbClient.connect();
         const db = dbClient.db('discdoor');
-        userMgr = new UserManager(db);
-        sessionMgr = new SessionManager(db);
+        appContext.userMgr = new UserManager(db);
+        appContext.sessionMgr = new SessionManager(db);
         console.log("DB connection success!");
     } catch(e) {
         console.log("Error: Database connection failure, see exception below:");
