@@ -78,6 +78,9 @@ app.post('/login', async(req, res) => {
 
         if(!result)
             throw new Error("Password does not match.");
+
+        // Update login date
+        await user.updateLoginDate();
         
         // Create a session
         const session = await appContext.sessionMgr.createSession(user);
