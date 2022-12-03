@@ -1,6 +1,7 @@
 {
     "http": {
-        "port": 8082
+        "port": 8082,
+        "restrict_hostname": "localhost"
     },
     "db": {
         "url": "mongodb://localhost:27017"

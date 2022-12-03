@@ -90,6 +90,32 @@ app.post('/login', async(req, res) => {
     }
 });
 
+// --- Restricted (internal) routes ---
+/**
+ * User view state endpoint.
+ */
+ app.get("/user/:id/view", async(req, res) => {
+    if(req.hostname !== cfg.http.restrict_hostname)
+        return sendResponseObject(res, 403, constructResponseObject(false, "Access denied"));
+
+    try {
+        // Check types
+        validateSchema({
+            id: { type: "string" },
+        }, req.params);
+
+        // Get the user
+        const user = await appContext.userMgr.getUserById(req.params.id);
+
+        if(!user)
+            throw new Error("User not found.");
+
+        sendResponseObject(res, 200, constructResponseObject(true, "", user.createCacheView()));
+    } catch(e) {
+        sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
+    }
+});
+
 // Add session verification middleware
 require('./lib/middleware/session-verif').init(appContext);
 
