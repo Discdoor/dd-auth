@@ -94,7 +94,7 @@ app.post('/login', async(req, res) => {
 require('./lib/middleware/session-verif').init(appContext);
 
 // --- Privileged routes ---
-app.post("/session/validate", (req, res) => sendResponseObject(res, 200, constructResponseObject(true, "")));
+app.post("/session/validate", (req, res) => sendResponseObject(res, 200, constructResponseObject(true, "", req.session)));
 
 /*
 State endpoint - get the current user state.
