@@ -24,9 +24,15 @@
         "username": {
             "minLen": 2,
             "maxLen": 30
+        },
+        "avatar": {
+            "maxSize": 2097152
         }
     },
     "defaults": {
         "avatarUrl": "/assets/defaults/avatar1.png"
+    },
+    "extern": {
+        "cdn": "http://localhost:8082"
     }
 }

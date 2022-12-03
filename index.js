@@ -15,9 +15,6 @@ const SessionManager = require('./lib/mgmt/sessionmgr');
 const { constructResponseObject, sendResponseObject } = libdd.api;
 const { validateSchema } = libdd.schema;
 
-// Set a reasonable limit for the JSON body parser
-app.use(express.json({limit: '10kb'}));
-
 // Disable CORS since the auth server will be going thru the gateway anyway.
 app.use(cors());
 
@@ -30,7 +27,11 @@ const appContext = {
     sessionMgr: null
 };
 
+const sessionVerifMiddleware = require('./lib/middleware/session-verif').init(appContext);
+
 // ++++++++++++++++++ END POINTS ++++++++++++++++++ //
+// Set a reasonable limit for the JSON body parser
+app.use(express.json({limit: '10kb'}));
 
 // --- Unprivileged routes ---
 /**
@@ -117,7 +118,7 @@ app.post('/login', async(req, res) => {
 });
 
 // Add session verification middleware
-require('./lib/middleware/session-verif').init(appContext);
+app.use(sessionVerifMiddleware);
 
 // --- Privileged routes ---
 app.post("/session/validate", (req, res) => sendResponseObject(res, 200, constructResponseObject(true, "", req.session)));
