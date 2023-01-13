@@ -18,6 +18,10 @@ This service handles verification AND generation. It is recommended to run a clu
 
 4. Run `node index.js` to start this service.
 
+## Running unit tests
+
+You can run unit tests by running `npm test`. If all unit tests succeed, you are good to go!
+
 ## Important!
 
 Remember to CHANGE THE SALT! The default one provided here has only been provided for simplicity and testing, but please change it for production to avoid security issues.

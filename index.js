@@ -14,6 +14,10 @@ const { RGX_EMAIL } = require('./lib/util/regex');
 const SessionManager = require('./lib/mgmt/sessionmgr');
 const { constructResponseObject, sendResponseObject } = libdd.api;
 const { validateSchema } = libdd.schema;
+const morgan = require('morgan');
+
+// Setup logger
+app.use(morgan('dev'));
 
 // Disable CORS since the auth server will be going thru the gateway anyway.
 app.use(cors());

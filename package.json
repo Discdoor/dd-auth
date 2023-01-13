@@ -4,7 +4,7 @@
   "description": "DiscDoor authentication service",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,11 @@
     "libdd-node": "github:Discdoor/libdd-node",
     "mongodb": "^4.9.1",
     "mongoose": "^6.6.1",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@shelf/jest-mongodb": "^4.1.4",
+    "jest": "^29.3.1"
   }
 }
