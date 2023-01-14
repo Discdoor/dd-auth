@@ -29,7 +29,8 @@ jobs:
         mkdir ~/.ssh
         echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 0644 ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa.pub
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
