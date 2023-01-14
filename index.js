@@ -186,11 +186,11 @@ app.use((error, req, res, next) => {
  */
 async function main() {
     // Step 1: Connect to database
-    console.log("Connecting to database...");
+    console.log(`Connecting to database at ${cfg.db.url}...`);
 
     try {
         await dbClient.connect();
-        const db = dbClient.db('discdoor');
+        const db = dbClient.db(cfg.db.name);
         appContext.userMgr = new UserManager(db);
         appContext.sessionMgr = new SessionManager(db);
         console.log("DB connection success!");

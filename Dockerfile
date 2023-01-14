@@ -1,10 +1,10 @@
 # Use NODEJS
-FROM node:16-bullseye
+FROM node:16
 
-# Create app directory
+# Setup image
 WORKDIR /usr/src/auth
 COPY package*.json ./
+COPY . ./
 RUN npm install
-COPY . .
-EXPOSE 8082
-CMD [ "node", "index.js" ]
+EXPOSE ${PORT}
+CMD [ "npm", "run", "start" ]

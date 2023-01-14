@@ -4,6 +4,7 @@
         "restrict_hostname": "localhost"
     },
     "db": {
+        "name": "discdoor",
         "url": "mongodb://127.0.0.1:27017"
     },
     "crypto": {
