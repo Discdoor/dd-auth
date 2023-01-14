@@ -6,5 +6,5 @@ WORKDIR /usr/src/auth
 COPY package*.json ./
 COPY . ./
 RUN npm install
-EXPOSE ${PORT}
+EXPOSE 8082
 CMD [ "npm", "run", "start" ]
