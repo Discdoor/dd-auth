@@ -152,8 +152,9 @@ app.patch("/user/@me", async(req, res) => {
         // Get the user
         // Validate the schema
         validateSchema({
+            username: { type: "string", minLength: cfg.limits.username.minLen, maxLength: cfg.limits.username.maxLen, optional: true },
+            email: { type: "string", regex: RGX_EMAIL, optional: true },
             password: { type: "string", maxLength: 64, optional: true }
-            // TODO add fields for username and email
         }, req.body);
         
         const user = await appContext.userMgr.getUserById(req.session.id);
@@ -164,6 +165,12 @@ app.patch("/user/@me", async(req, res) => {
         // Change the requested properties
         if(req.body.password != null)
             await user.changePassword(req.body.password);
+
+        if(req.body.email != null)
+            await user.changeEmail(req.body.email);
+
+        if(req.body.username != null)
+            await user.changeUsername(req.body.username);
 
         sendResponseObject(res, 200, constructResponseObject(true, "", user.createSafeView()));
     } catch(e) {
