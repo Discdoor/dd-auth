@@ -121,6 +121,28 @@ app.post('/login', async(req, res) => {
     }
 });
 
+app.post("/user/resolve", async(req, res)=> {
+    if(req.hostname !== cfg.http.restrict_hostname)
+        return sendResponseObject(res, 403, constructResponseObject(false, "Access denied"));
+
+    try {
+        // Check types
+        validateSchema({
+            tag: { type: "string" },
+        }, req.body);
+
+        // Get the user
+        const user = await appContext.userMgr.getUserByTag(req.body.tag);
+
+        if(!user)
+            throw new Error("User not found.");
+
+        sendResponseObject(res, 200, constructResponseObject(true, "", user.createCacheView()));
+    } catch(e) {
+        sendResponseObject(res, 400, constructResponseObject(false, e.message || ""));
+    }
+});
+
 // Add session verification middleware
 app.use(sessionVerifMiddleware);
 
