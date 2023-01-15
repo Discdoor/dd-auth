@@ -6,3 +6,4 @@ The authentication service is responsible for managing users, providing login/re
  - [User accounts](./user-accounts.md)
  - [Hashing and verification](./hashing-and-verification.md)
  - [API Endpoints](./endpoints.md)
+ - [Configuration](./configuration.md)
