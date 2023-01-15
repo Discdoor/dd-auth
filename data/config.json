@@ -19,7 +19,7 @@
         }
     },
     "session": {
-        "maxAge": 604800
+        "maxAge": 6048000
     },
     "limits": {
         "username": {
